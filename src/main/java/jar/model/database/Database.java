@@ -5,6 +5,8 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -58,34 +60,19 @@ public class Database {
 
     }
 
-    public static void retrieveImage(int id) {
-        //Получаем изображение из базы
-        /**Ну и получаем данные НАКОНЕЦТО*/
-        //PreparedStatement
-        try {
-            Statement st = Database.getConnection().createStatement();
-            st.executeUpdate(USE_DB);
-//            st.executeUpdate("CREATE table persons (id int(4) not null primary key , name varchar(32), age int(3))");
-//            st.executeUpdate("INSERT into persons (id,name,age) values (11,'Name3', 38)");
-//            ResultSet rs = st.executeQuery("SELECT * FROM PERSONS ORDER BY NAME desc ");
-//            while (rs.next()) {
-//                System.out.println(rs.getString("id")
-//                        + "-"
-//                        + rs.getString("name")
-//                        + "-"
-//                        + rs.getString("age"));
-//            }
-//            PreparedStatement st2 = Database.getConnection().prepareStatement("SELECT * FROM ? WHERE age = ?");
-//            st2.setString(1, "persons");
-//            st2.setInt(2, 30);
-            getConnection().commit();
-
-            //return image
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            System.out.println("error in Request Image");
-            //TODO ЛОГГЕР
-        }
+    /**Получаем изображение из базы*/
+    public static ImageImpl retrieveImage(int id) throws IOException, SQLException {
+        String retrieveImage = " SELECT * FROM db.images where id = ?";
+        PreparedStatement st = Database.getConnection().prepareStatement(retrieveImage);
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        int index = rs.getInt(1);
+        Blob imageBlob = rs.getBlob(2);
+        BufferedImage bufferedImage = ImageIO.read(imageBlob.getBinaryStream());
+        Image image = SwingFXUtils.toFXImage(bufferedImage, null);
+        String fileName = rs.getString(3);
+        String description = rs.getString(3);
+        return new ImageImpl(image, index, fileName, description);
     }
 
     public static List<String> getImageList() {
@@ -95,7 +82,7 @@ public class Database {
             PreparedStatement requestImageListStmt = Database.getConnection().prepareStatement(requestImageListStmtStr);
             ResultSet rs = requestImageListStmt.executeQuery();
             while (rs.next()) {
-               imageNamesList = Stream.of(rs.getString(1)).collect(Collectors.toList());
+                imageNamesList = Stream.of(rs.getString(1)).collect(Collectors.toList());
             }
             return imageNamesList;
 
@@ -142,7 +129,9 @@ public class Database {
 
     }
 
-    /**Добавляем изображение в базу по получению из интерфейса*/
+    /**
+     * Добавляем изображение в базу по получению из интерфейса
+     */
     public static void uploadImage(ImageImpl imageImpl) {
 
         String uploadImageStmntString = " insert INTO db.images (id, image_blob, file_name, description ) VALUES (?, ?, ?, ?)";

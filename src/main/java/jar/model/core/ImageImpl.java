@@ -26,6 +26,13 @@ public class ImageImpl {
         this.description = description;
     }
 
+    public ImageImpl(Image image, int id, String fileName, String description) {
+        this.image = image;
+        this.id = id;
+        this.fileName = fileName;
+        this.description = description;
+    }
+
     //--TODO Convert file back to image and feed it to JFX
 
 
