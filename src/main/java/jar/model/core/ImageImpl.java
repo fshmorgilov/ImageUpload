@@ -16,6 +16,7 @@ public class ImageImpl {
         this.image= image;
         this.fileName = fileName;
         this.id = ImageIdController.getNewId();
+        this.description = "";
     }
 
     public ImageImpl(Image image, String description, String fileName) {
@@ -23,9 +24,6 @@ public class ImageImpl {
         this.fileName = fileName;
         this.id = ImageIdController.getNewId();
         this.description = description;
-//        FileReader fileReader = new FileReader(this.image.)
-        //--TODO retrieve file from image and pass it to the DB.
-
     }
 
     //--TODO Convert file back to image and feed it to JFX

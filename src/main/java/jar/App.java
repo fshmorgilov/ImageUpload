@@ -29,7 +29,6 @@ public class App extends Application
         } catch (Exception ex){
             ex.printStackTrace();
         }
-
     }
 
     public static void main(String[] args )
@@ -45,12 +44,13 @@ public class App extends Application
         Database.setupDatabase();
         Image image = new Image("TestImage.jpg");
         ImageImpl test = new ImageImpl(image, "","TestImage.jpg");
-//        Database.uploadImage(test);
+        Database.uploadImage(test);
         try {
             Database.retrieveText();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+//        Database.getImageList();
 //        Database.uploadText("Sample");
 
 

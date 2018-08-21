@@ -11,10 +11,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Database {
 
@@ -32,13 +35,16 @@ public class Database {
         try {
             Class.forName(DRV_NAME);
             System.out.println("Driver retrieved");
+            //TODO ЛОГГЕР
         } catch (ClassNotFoundException ex) {
             System.out.println("Driver not found");
+            //TODO ЛОГГЕР
             System.exit(-1);
         }
         /**Подплючаемся к базе*/
         Connection connection = DriverManager.getConnection(CONN_STRING);
         System.out.println("Connection established");
+        //TODO ЛОГГЕР
 //        Connection connection = DriverManager.getConnection(NEW_CONN_STRING, "root", "root");
 //        connection.setAutoCommit(false);
         /**Получить результаты работы getConnection*/
@@ -52,7 +58,7 @@ public class Database {
 
     }
 
-    public static void requestImage(int id) {
+    public static void retrieveImage(int id) {
         //Получаем изображение из базы
         /**Ну и получаем данные НАКОНЕЦТО*/
         //PreparedStatement
@@ -78,24 +84,28 @@ public class Database {
         } catch (SQLException ex) {
             ex.printStackTrace();
             System.out.println("error in Request Image");
+            //TODO ЛОГГЕР
         }
     }
 
-    //--TODO  доделать, добавить результат list
-    public static void getImageList() {
-        //Добавляем изображение в базу по получению из интерфейса
-        String requestImageListStmtStr = "SELECT ";
-
-        //--TODO add logic
-
-
+    public static List<String> getImageList() {
+        String requestImageListStmtStr = "SELECT FILE_NAME from db.images;";
+        List<String> imageNamesList = new ArrayList<>();
         try {
             PreparedStatement requestImageListStmt = Database.getConnection().prepareStatement(requestImageListStmtStr);
+            ResultSet rs = requestImageListStmt.executeQuery();
+            while (rs.next()) {
+               imageNamesList = Stream.of(rs.getString(1)).collect(Collectors.toList());
+            }
+            return imageNamesList;
+
         } catch (SQLException e) {
             e.printStackTrace();
+            //TODO ЛОГГЕР
+            //FIXME прожовывает эксепшн
+            return imageNamesList;
         }
     }
-
 
     public static void setupDatabase() {
         String createTableText = "CREATE TABLE IF NOT EXISTS `TEXT_TEST` (`id` INT(4) NOT NULL PRIMARY KEY, `text` VARCHAR(40) NULL)";
@@ -125,15 +135,17 @@ public class Database {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Failed to create tables");
+            //TODO ЛОГГЕР
         }
 //                    st.executeUpdate("CREATE table persons (id int(4) not null primary key , name varchar(32), age int(3))");
 //            st.executeUpdate("INSERT into persons (id,name,age) values (11,'Name3', 38)");
 
     }
 
+    /**Добавляем изображение в базу по получению из интерфейса*/
     public static void uploadImage(ImageImpl imageImpl) {
 
-        String uploadImageStmntString = "INSERT INTO DB.IMAGES VALUES (?, ?, ?, ?)";
+        String uploadImageStmntString = " insert INTO db.images (id, image_blob, file_name, description ) VALUES (?, ?, ?, ?)";
         //запросить полный список изображений из базы
         try {
             Statement useDB = getConnection().createStatement();
@@ -151,22 +163,25 @@ public class Database {
         } catch (SQLException ex) {
             ex.printStackTrace();
             System.out.println("error in getImageList");
+            //TODO ЛОГГЕР
         } catch (IOException ex) {
             ex.printStackTrace();
+            //TODO ЛОГГЕР
         }
     }
 
     public static void uploadText(String text) {
 
-        String uploadTextStmntString = "INSERT INTO DB.TEXT_TEST (id, text) VALUES (?, ?)";
+        String uploadTextStmntString = "INSERT INTO db.text_test (id, text) VALUES (?, ?)";
         try {
             PreparedStatement uploadTextStatement = Database.getConnection().prepareStatement(uploadTextStmntString);
-            uploadTextStatement.setInt(1, 1);
+            uploadTextStatement.setInt(1, 3);
             uploadTextStatement.setString(2, text);
             uploadTextStatement.executeUpdate();
-            getConnection().commit();
+//            getConnection().commit(); //--TODO
         } catch (SQLException ex) {
             ex.printStackTrace();
+            //TODO ЛОГГЕР
         }
     }
 
