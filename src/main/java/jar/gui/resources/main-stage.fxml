@@ -10,15 +10,15 @@
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.Stop?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jar.gui.MainGuiController">
+<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jar.gui.MainGuiController">
     <center>
         <ImageView fx:id="showImage" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
     </center>
     <bottom>
         <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <buttons>
-                <Button fx:id="uploadBtn" mnemonicParsing="false" text="Upload" onAction="#uploadImage"/>
-                <Button fx:id="showBtn" mnemonicParsing="false" text="Show" onAction="#showImage">
+                <Button fx:id="uploadBtn" mnemonicParsing="false" onAction="#uploadImage" text="Upload" />
+                <Button fx:id="showBtn" mnemonicParsing="false" onAction="#showImage" text="Show">
                     <textFill>
                         <LinearGradient endX="0.6571428571428571" endY="0.4666666666666667" startX="0.28095238095238095" startY="0.2047619047619047">
                             <stops>
