@@ -5,12 +5,8 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageInputStream;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,7 +24,7 @@ public class Database {
     private static final String NEW_CONN_STRING = "jdbc:mysql://localhost:3306/";
     private static final String USE_DB = "USE DB;";
 
-    public static Connection getConnection() throws SQLException {
+    private static Connection getConnection() throws SQLException {
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             System.out.println(drivers.nextElement());
@@ -75,6 +71,7 @@ public class Database {
         return new ImageImpl(image, index, fileName, description);
     }
 
+    /**Получаем список названий файлов изображений из базы*/
     public static List<String> getImageList() {
         String requestImageListStmtStr = "SELECT FILE_NAME from db.images;";
         List<String> imageNamesList = new ArrayList<>();
@@ -94,6 +91,7 @@ public class Database {
         }
     }
 
+    /**Развертывание таблиц в базе*/
     public static void setupDatabase() {
         String createTableText = "CREATE TABLE IF NOT EXISTS `TEXT_TEST` (`id` INT(4) NOT NULL PRIMARY KEY, `text` VARCHAR(40) NULL)";
         String createTableImages = "CREATE TABLE IF NOT EXISTS `images` (`id` INT(4) NOT NULL PRIMARY KEY, `image_blob` BLOB NULL,`file_name` VARCHAR(40) NULL,`description` VARCHAR(40) NULL)";
@@ -129,9 +127,7 @@ public class Database {
 
     }
 
-    /**
-     * Добавляем изображение в базу по получению из интерфейса
-     */
+    /** Добавляем изображение в базу по получению из интерфейса */
     public static void uploadImage(ImageImpl imageImpl) {
 
         String uploadImageStmntString = " insert INTO db.images (id, image_blob, file_name, description ) VALUES (?, ?, ?, ?)";

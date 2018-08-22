@@ -10,37 +10,34 @@
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.Stop?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="jar.gui.MainGuiController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jar.gui.MainGuiController">
     <center>
-        <ImageView fx:id="showImage" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER"/>
+        <ImageView fx:id="showImage" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
     </center>
     <bottom>
         <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <buttons>
-                <Button fx:id="uploadBtn" mnemonicParsing="false" text="Upload"/>
-                <Button fx:id="showBtn" mnemonicParsing="false" text="Show">
+                <Button fx:id="uploadBtn" mnemonicParsing="false" text="Upload" onAction="#uploadImage"/>
+                <Button fx:id="showBtn" mnemonicParsing="false" text="Show" onAction="#showImage">
                     <textFill>
-                        <LinearGradient endX="0.6571428571428571" endY="0.4666666666666667" startX="0.28095238095238095"
-                                        startY="0.2047619047619047">
+                        <LinearGradient endX="0.6571428571428571" endY="0.4666666666666667" startX="0.28095238095238095" startY="0.2047619047619047">
                             <stops>
-                                <Stop color="#6d33ab"/>
-                                <Stop color="#9e5847" offset="1.0"/>
+                                <Stop color="#6d33ab" />
+                                <Stop color="#9e5847" offset="1.0" />
                             </stops>
                         </LinearGradient>
                     </textFill>
                 </Button>
             </buttons>
             <opaqueInsets>
-                <Insets/>
+                <Insets />
             </opaqueInsets>
         </ButtonBar>
     </bottom>
     <left>
-        <ListView fx:id="imageNamesList" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+        <ListView fx:id="imageNamesList" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
     </left>
     <top>
-        <Label prefHeight="30.0" prefWidth="191.0" text="Image View" BorderPane.alignment="CENTER"/>
+        <Label prefHeight="30.0" prefWidth="191.0" text="Image View" BorderPane.alignment="CENTER" />
     </top>
 </BorderPane>

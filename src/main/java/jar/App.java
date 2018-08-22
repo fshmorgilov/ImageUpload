@@ -33,18 +33,12 @@ public class App extends Application
 
     public static void main(String[] args )
     {
-//        launch(args);
-        try {
-            Database.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Connection failed");
-        }
+        launch(args);
 
         Database.setupDatabase();
-        Image image = new Image("TestImage.jpg");
-        ImageImpl test = new ImageImpl(image, "","TestImage.jpg");
-        Database.uploadImage(test);
+//        Image image = new Image("TestImage.jpg");
+//        ImageImpl test = new ImageImpl(image, "","TestImage.jpg");
+//        Database.uploadImage(test);
         try {
             Database.retrieveText();
         } catch (SQLException e) {
