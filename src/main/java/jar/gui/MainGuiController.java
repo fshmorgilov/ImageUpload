@@ -16,13 +16,18 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
+import java.awt.image.LookupOp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainGuiController implements Initializable {
+
+    private static final Logger LOGGER = Logger.getLogger(MainGuiController.class.getName());
 
     @FXML
     ListView<String> imageNamesList;
@@ -39,7 +44,7 @@ public class MainGuiController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 //--TODO добавить тут коллекцию из базы данных
 
-        Image image = new Image("TestImage.jpg");
+//        Image image = new Image("TestImage.jpg");
     }
 
     /**
@@ -54,19 +59,17 @@ public class MainGuiController implements Initializable {
         //Profit
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
-        File defaultDirectory = new File("C:/");
+        File defaultDirectory = new File("C:/Users/");
         chooser.setInitialDirectory(defaultDirectory);
         File imageFile = chooser.showOpenDialog(mainPane.getScene().getWindow());
         //
-        System.out.println(imageFile.getAbsolutePath());
-        //TODO логгер
+        LOGGER.log(Level.FINE, "Uploading file: {0}", imageFile.getAbsolutePath());
         if (!(("".equals(imageFile.getAbsolutePath())))
                 && (imageFile.canRead())) {
             Image image = null;
             try {
                 image = new Image(new FileInputStream(imageFile));
-//            ImageImpl imageImplObj = new ImageImpl(new Image(imageFile.getAbsolutePath()), "placeholder", imageFile.getPath());
-                ImageImpl imageImplObj = new ImageImpl(image, "placeholder", imageFile.getPath());
+                ImageImpl imageImplObj = new ImageImpl(image, "placeholder", imageFile.getName());
             Database.uploadImage(imageImplObj);
             } catch (FileNotFoundException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -80,6 +83,7 @@ public class MainGuiController implements Initializable {
             alert.setTitle("Information");
             alert.setHeaderText("Image is not readable");
             alert.showAndWait();
+            LOGGER.log(Level.FINE, "");
         }
 
 
@@ -103,24 +107,24 @@ public class MainGuiController implements Initializable {
         //Отобразить изображение в ImageView
     }
 
-    private void initializeImageNamesList() {
-        ObservableList<String> imageNameList = FXCollections.observableArrayList();
-        imageNameList.addAll(Database.getImageList());
-        imageNameList.addListener(new ListChangeListener<String>() {
-            @Override
-            public void onChanged(Change<? extends String> c) {
-                while (c.next()) {
-                    if (c.wasRemoved()) {
-
-                    }
-                    if (c.wasAdded()) {
-                        //TODO дописать логику вставки изображения
-                    }
-                }
-            }
-        });
-        imageNamesList = new ListView<>(imageNameList);
-    }
+//    private void initializeImageNamesList() {
+//        ObservableList<String> imageNameList = FXCollections.observableArrayList();
+//        imageNameList.addAll(Database.getImageList());
+//        imageNameList.addListener(new ListChangeListener<String>() {
+//            @Override
+//            public void onChanged(Change<? extends String> c) {
+//                while (c.next()) {
+//                    if (c.wasRemoved()) {
+//
+//                    }
+//                    if (c.wasAdded()) {
+//                        //TODO дописать логику вставки изображения
+//                    }
+//                }
+//            }
+//        });
+//        imageNamesList = new ListView<>(imageNameList);
+//    }
 
 
 }

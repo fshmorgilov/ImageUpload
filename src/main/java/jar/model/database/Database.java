@@ -8,16 +8,20 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Database {
+public abstract class Database {
+
+    private static Logger LOGGER = Logger.getLogger(Database.class.getName());
 
     private static final String DRV_NAME = "com.mysql.cj.jdbc.Driver";
     private static final String CONN_STRING = "jdbc:mysql://localhost:3306/?user=root&password=root&useLegacyDatetimeCode=false&serverTimezone=UTC";
@@ -56,7 +60,9 @@ public class Database {
 
     }
 
-    /**Получаем изображение из базы*/
+    /**
+     * Получаем изображение из базы
+     */
     public static ImageImpl retrieveImage(int id) throws IOException, SQLException {
         String retrieveImage = " SELECT * FROM db.images where id = ?";
         PreparedStatement st = Database.getConnection().prepareStatement(retrieveImage);
@@ -71,7 +77,9 @@ public class Database {
         return new ImageImpl(image, index, fileName, description);
     }
 
-    /**Получаем список названий файлов изображений из базы*/
+    /**
+     * Получаем список названий файлов изображений из базы
+     */
     public static List<String> getImageList() {
         String requestImageListStmtStr = "SELECT FILE_NAME from db.images;";
         List<String> imageNamesList = new ArrayList<>();
@@ -91,7 +99,31 @@ public class Database {
         }
     }
 
-    /**Развертывание таблиц в базе*/
+    /**
+     * Получаем список Id файлов изображений из базы
+     */
+    public static ArrayList<Integer> getImageIdList() {
+        String requestImageIdStmtStr = "SELECT id from db.images;";
+        ArrayList<Integer> imageIdList = new ArrayList<>();
+        try {
+            PreparedStatement requestImageIdListStmt = Database.getConnection().prepareStatement(requestImageIdStmtStr);
+            ResultSet rs = requestImageIdListStmt.executeQuery();
+            while (rs.next()) {
+                imageIdList.addAll(Stream.of(rs.getInt(1)).collect(Collectors.toList()));
+            }
+            return imageIdList;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //TODO ЛОГГЕР
+            //FIXME прожовывает эксепшн
+            return imageIdList;
+        }
+    }
+
+    /**
+     * Развертывание таблиц в базе
+     */
     public static void setupDatabase() {
         String createTableText = "CREATE TABLE IF NOT EXISTS `TEXT_TEST` (`id` INT(4) NOT NULL PRIMARY KEY, `text` VARCHAR(40) NULL)";
         String createTableImages = "CREATE TABLE IF NOT EXISTS `images` (`id` INT(4) NOT NULL PRIMARY KEY, `image_blob` BLOB NULL,`file_name` VARCHAR(40) NULL,`description` VARCHAR(40) NULL)";
@@ -114,20 +146,24 @@ public class Database {
             st.execute(USE_DB);
             st.executeUpdate(createTableImages);
             st.executeUpdate(createTableText);
+            LOGGER.finest("tables updated");
 //            getConnection().commit();
 
             //--TODO ВЫКЛЮЧИТЬ AUTOCOMMIT
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Failed to create tables");
+            LOGGER.severe(ex.getMessage());
+
             //TODO ЛОГГЕР
         }
 //                    st.executeUpdate("CREATE table persons (id int(4) not null primary key , name varchar(32), age int(3))");
 //            st.executeUpdate("INSERT into persons (id,name,age) values (11,'Name3', 38)");
-
     }
 
-    /** Добавляем изображение в базу по получению из интерфейса */
+    /**
+     * Добавляем изображение в базу по получению из интерфейса
+     */
     public static void uploadImage(ImageImpl imageImpl) {
 
         String uploadImageStmntString = " insert INTO db.images (id, image_blob, file_name, description ) VALUES (?, ?, ?, ?)";
@@ -180,4 +216,5 @@ public class Database {
         }
         return rs;
     }
+
 }
