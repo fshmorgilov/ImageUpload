@@ -36,26 +36,14 @@ public abstract class Database {
         /**Загружаем драйвер*/
         try {
             Class.forName(DRV_NAME);
-            System.out.println("Driver retrieved");
-            //TODO ЛОГГЕР
+            LOGGER.finest("Driver retrieved: " +"DRV_NAME" );
         } catch (ClassNotFoundException ex) {
-            System.out.println("Driver not found");
-            //TODO ЛОГГЕР
+            LOGGER.severe("Driver not found \n" + ex.getMessage());
             System.exit(-1);
         }
         /**Подплючаемся к базе*/
         Connection connection = DriverManager.getConnection(CONN_STRING);
-        System.out.println("Connection established");
-        //TODO ЛОГГЕР
-//        Connection connection = DriverManager.getConnection(NEW_CONN_STRING, "root", "root");
-//        connection.setAutoCommit(false);
-        /**Получить результаты работы getConnection*/
-//        try {
-//            ResultSet resultSet = connection.getMetaData().getCatalogs();
-//            while (resultSet.next()) System.out.println(resultSet.getString("TABLE_CAT"));
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        LOGGER.finest("Connection to DB fine");
         return connection;
 
     }
@@ -74,6 +62,7 @@ public abstract class Database {
         Image image = SwingFXUtils.toFXImage(bufferedImage, null);
         String fileName = rs.getString(3);
         String description = rs.getString(3);
+        LOGGER.fine("Retrieve image: " + fileName);
         return new ImageImpl(image, index, fileName, description);
     }
 
@@ -93,7 +82,7 @@ public abstract class Database {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO ЛОГГЕР
+            LOGGER.severe("Error in getImageList\n" + e.getMessage());
             //FIXME прожовывает эксепшн
             return imageNamesList;
         }
@@ -115,8 +104,7 @@ public abstract class Database {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO ЛОГГЕР
-            //FIXME прожовывает эксепшн
+            LOGGER.severe("Error in getImageIdList\n" + e.getMessage());
             return imageIdList;
         }
     }
@@ -127,35 +115,16 @@ public abstract class Database {
     public static void setupDatabase() {
         String createTableText = "CREATE TABLE IF NOT EXISTS `TEXT_TEST` (`id` INT(4) NOT NULL PRIMARY KEY, `text` VARCHAR(40) NULL)";
         String createTableImages = "CREATE TABLE IF NOT EXISTS `images` (`id` INT(4) NOT NULL PRIMARY KEY, `image_blob` BLOB NULL,`file_name` VARCHAR(40) NULL,`description` VARCHAR(40) NULL)";
-//        String createTableImages = "USE `db`;" +
-//                "CREATE TABLE IF NOT EXISTS `images` (" +
-//                "`id` INT(4) NOT NULL PRIMARY KEY," +
-//                "`image_blob` BLOB NULL," +
-//                "`file_name` VARCHAR(40) NULL," +
-//                "`description` VARCHAR(40) NULL" +
-//                ");";
-//        String createTableImages = "CREATE TABLE 'images' " +
-//                "('id' int(4) NOT NULL PRIMARY KEY" +
-//                ", 'image_blob' blob" +
-//                ", 'file_name' varchar(40))";
-//
         try {
 
             Statement st = Database.getConnection().createStatement();
-//            st.executeUpdate("CREATE DATABASE db");
             st.execute(USE_DB);
             st.executeUpdate(createTableImages);
             st.executeUpdate(createTableText);
             LOGGER.finest("tables updated");
-//            getConnection().commit();
-
             //--TODO ВЫКЛЮЧИТЬ AUTOCOMMIT
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Failed to create tables");
-            LOGGER.severe(ex.getMessage());
-
-            //TODO ЛОГГЕР
+            LOGGER.severe("Failed to create tables. \n" +ex.getMessage());
         }
 //                    st.executeUpdate("CREATE table persons (id int(4) not null primary key , name varchar(32), age int(3))");
 //            st.executeUpdate("INSERT into persons (id,name,age) values (11,'Name3', 38)");
@@ -181,13 +150,12 @@ public abstract class Database {
 //            st.execute(USE_DB);
             uploadImageStmt.executeUpdate();
             getConnection().commit();
+            LOGGER.finest("Writing image to database: " + imageImpl.getFileName() + "\nId in Database :" + imageImpl.getId());
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            System.out.println("error in getImageList");
-            //TODO ЛОГГЕР
+            LOGGER.severe("Error in uploading image to SQL");
+            LOGGER.severe(ex.getMessage());
         } catch (IOException ex) {
-            ex.printStackTrace();
-            //TODO ЛОГГЕР
+            LOGGER.severe("Error: file is corrupted \n" + ex.getMessage());
         }
     }
 
@@ -201,8 +169,7 @@ public abstract class Database {
             uploadTextStatement.executeUpdate();
 //            getConnection().commit(); //--TODO
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            //TODO ЛОГГЕР
+            LOGGER.warning(ex.getMessage());
         }
     }
 

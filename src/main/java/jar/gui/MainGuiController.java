@@ -53,8 +53,6 @@ public class MainGuiController implements Initializable {
 
     @FXML
     void uploadImage() {
-        //Выводит диалоговое окно, где предлагается выбрать путь//--TODO DONE
-        //Выбирает файл, добавляет в коллекцию//--TODO
         //Вызывает базу, добавляет файл//--TODO
         //Profit
         FileChooser chooser = new FileChooser();
@@ -85,13 +83,6 @@ public class MainGuiController implements Initializable {
             alert.showAndWait();
             LOGGER.log(Level.FINE, "");
         }
-
-
-//        DirectoryChooser chooser = new DirectoryChooser();
-//        chooser.setTitle("JavaFX Projects");
-//        File defaultDirectory = new File("c:/dev/javafx");
-//        chooser.setInitialDirectory(defaultDirectory);
-//        File selectedDirectory = chooser.showDialog(primaryStage);
     }
 
     /**

@@ -3,6 +3,7 @@ package jar.model.core;
 import jar.model.database.Database;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,8 +18,10 @@ public abstract class ImageIdController {
             LOGGER.log(Level.FINE, "Created new ImageId list");
             return 1;
         } else {
-            int x = (imageIdList.get(imageIdList.size()));
-            imageIdList.add(++x);
+            LOGGER.log(Level.FINE, "imageIdList size: :"+ imageIdList.size());
+            int idArraySize = imageIdList.get(imageIdList.size() -1);
+            int x = idArraySize++;
+            imageIdList.add(x);
             LOGGER.log(Level.FINE, "generated id: {0}", ++x);
             return ++x;
         }
@@ -31,6 +34,8 @@ public abstract class ImageIdController {
 
     public static void initializeImageIdController() {
         imageIdList.addAll(Database.getImageIdList());
+        imageIdList.sort(Comparator.comparing(Integer::intValue));
+        imageIdList.forEach(x-> LOGGER.info(x.toString()));
         LOGGER.log(Level.FINE, "Id list size: {0}", imageIdList.size());
     }
 }

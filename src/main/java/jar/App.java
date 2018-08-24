@@ -46,7 +46,7 @@ public class App extends Application
     public static void main(String[] args )
     {
         try {
-            LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME).setLevel(Level.FINEST);
+//            LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME).setLevel(Level.FINEST);
             InputStream logConfig = App.class.getClassLoader().getResourceAsStream("log.properties");
             LogManager.getLogManager().readConfiguration(logConfig);
             LOGGER = Logger.getLogger(App.class.getName());
@@ -56,9 +56,9 @@ public class App extends Application
 //                    , 1
 //                    , true);
             LOGGER.finest(LOGGER.getName());
-            LOGGER.info("an info msg");
-            LOGGER.warning("a warning msg");
-            LOGGER.severe("a severe msg");
+//            LOGGER.info("an info msg");
+//            LOGGER.warning("a warning msg");
+//            LOGGER.severe("a severe msg");
 //            fileHandler.setLevel(Level.FINEST);
 //            fileHandler.setFormatter(new SimpleFormatter());
 //            LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME).addHandler(fileHandler);
@@ -68,7 +68,7 @@ public class App extends Application
 //            LOGGER.addHandler(fileHandler);
         } catch (IOException e) {
             e.printStackTrace();
-            LOGGER.finest(e.getStackTrace().toString());
+            LOGGER.finest(e.getMessage());
         }
         LOGGER.finest("test");
         ImageIdController.initializeImageIdController();
