@@ -22,14 +22,13 @@ public class ImageImpl {
     public ImageImpl(Image image, String description, String fileName) {
         this.image = image;
         this.fileName = fileName;
-//        this.id = 15;
         this.id = ImageIdController.getNewId();
         this.description = description;
     }
 
     public ImageImpl(Image image, int id, String fileName, String description) {
         this.image = image;
-        this.id = ImageIdController.getNewId();
+        this.id = id;
         this.fileName = fileName;
         this.description = description;
     }

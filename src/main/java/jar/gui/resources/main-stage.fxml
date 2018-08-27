@@ -7,8 +7,6 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.paint.LinearGradient?>
-<?import javafx.scene.paint.Stop?>
 
 <BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jar.gui.MainGuiController">
     <center>
@@ -18,16 +16,6 @@
         <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <buttons>
                 <Button fx:id="uploadBtn" mnemonicParsing="false" onAction="#uploadImage" text="Upload" />
-                <Button fx:id="showBtn" mnemonicParsing="false" onAction="#showImage" text="Show">
-                    <textFill>
-                        <LinearGradient endX="0.6571428571428571" endY="0.4666666666666667" startX="0.28095238095238095" startY="0.2047619047619047">
-                            <stops>
-                                <Stop color="#6d33ab" />
-                                <Stop color="#9e5847" offset="1.0" />
-                            </stops>
-                        </LinearGradient>
-                    </textFill>
-                </Button>
             </buttons>
             <opaqueInsets>
                 <Insets />

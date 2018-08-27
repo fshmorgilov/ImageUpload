@@ -13,17 +13,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 
-import javax.xml.crypto.Data;
-import java.awt.event.MouseEvent;
-import java.beans.EventHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,13 +37,13 @@ public class MainGuiController implements Initializable {
     BorderPane mainPane;
 
 
-    ObservableList<String> imageNameList = FXCollections.observableArrayList();
-    ObservableMap<Integer, String> imageIdFileNameMap = FXCollections.observableMap(Database.retrieveIdFileNameMap());
+    private ObservableMap<Integer, String> imageIdFileNameMap;
+    private ObservableList imageValueList;
+    private ObservableList imageKeyList;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        initializeImageNameList();
+        initializeImageNameListView();
     }
 
     /**
@@ -71,7 +65,7 @@ public class MainGuiController implements Initializable {
                 image = new Image(new FileInputStream(imageFile));
                 ImageImpl imageImplObj = new ImageImpl(image, "placeholder", imageFile.getName());
                 Database.uploadImage(imageImplObj);
-                imageNameList.add(imageFile.getName());
+                imageIdFileNameMap.put(imageImplObj.getId(), imageImplObj.getFileName());
             } catch (FileNotFoundException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("ERROR");
@@ -97,10 +91,8 @@ public class MainGuiController implements Initializable {
     void showImage() {
     }
 
-
-    private void initializeImageNameList() {
-        ObservableList imageValueList = FXCollections.observableArrayList(imageIdFileNameMap.values());
-        ObservableList imageKeyList = FXCollections.observableArrayList(imageIdFileNameMap.keySet());
+    private void initializeImageNameListView() {
+        initializeImageLists();
         imageNamesListView.setItems(imageValueList);
         imageNamesListView.setOnMouseClicked(new javafx.event.EventHandler<javafx.scene.input.MouseEvent>() {
             @Override
@@ -117,6 +109,19 @@ public class MainGuiController implements Initializable {
                 System.out.println(id);
                 System.out.println(imageNamesListView.getSelectionModel().getSelectedItem());
                 System.out.println(imageNamesListView.getSelectionModel().getSelectedIndex());
+            }
+        });
+    }
+
+    private void initializeImageLists(){
+        imageIdFileNameMap = FXCollections.observableMap(Database.retrieveIdFileNameMap());
+        imageValueList = FXCollections.observableArrayList(imageIdFileNameMap.values());
+        imageKeyList = FXCollections.observableArrayList(imageIdFileNameMap.keySet());
+        imageIdFileNameMap.addListener(new MapChangeListener<Integer, String>() {
+            @Override
+            public void onChanged(Change<? extends Integer, ? extends String> change) {
+                imageKeyList.add(change.getKey());
+                imageValueList.add(change.getValueAdded());
             }
         });
     }
