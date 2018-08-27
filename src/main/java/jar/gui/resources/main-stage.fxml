@@ -35,7 +35,7 @@
         </ButtonBar>
     </bottom>
     <left>
-        <ListView fx:id="imageNamesList" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+        <ListView fx:id="imageNamesListView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
     </left>
     <top>
         <Label prefHeight="30.0" prefWidth="191.0" text="Image View" BorderPane.alignment="CENTER" />

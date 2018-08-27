@@ -1,6 +1,8 @@
 package jar.model.database;
 
 import jar.model.core.ImageImpl;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
@@ -10,11 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,7 +25,6 @@ public abstract class Database {
 
     private static final String DRV_NAME = "com.mysql.cj.jdbc.Driver";
     private static final String CONN_STRING = "jdbc:mysql://localhost:3306/?user=root&password=root&useLegacyDatetimeCode=false&serverTimezone=UTC";
-    private static final String NEW_CONN_STRING = "jdbc:mysql://localhost:3306/";
     private static final String USE_DB = "USE DB;";
 
     private static Connection getConnection() throws SQLException {
@@ -45,7 +44,6 @@ public abstract class Database {
         Connection connection = DriverManager.getConnection(CONN_STRING);
         LOGGER.finest("Connection to DB fine");
         return connection;
-
     }
 
     /**
@@ -56,14 +54,15 @@ public abstract class Database {
         PreparedStatement st = Database.getConnection().prepareStatement(retrieveImage);
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
-        int index = rs.getInt(1);
-        Blob imageBlob = rs.getBlob(2);
-        BufferedImage bufferedImage = ImageIO.read(imageBlob.getBinaryStream());
-        Image image = SwingFXUtils.toFXImage(bufferedImage, null);
-        String fileName = rs.getString(3);
-        String description = rs.getString(3);
-        LOGGER.fine("Retrieve image: " + fileName);
-        return new ImageImpl(image, index, fileName, description);
+        rs.next();
+            int index = rs.getInt(1);
+            Blob imageBlob = rs.getBlob(2);
+            BufferedImage bufferedImage = ImageIO.read(imageBlob.getBinaryStream());
+            Image image = SwingFXUtils.toFXImage(bufferedImage, null);
+            String fileName = rs.getString(3);
+            String description = rs.getString(3);
+            LOGGER.fine("Retrieve image: " + fileName);
+            return new ImageImpl(image, index, fileName, description);
     }
 
     /**
@@ -79,7 +78,6 @@ public abstract class Database {
                 imageNamesList = Stream.of(rs.getString(1)).collect(Collectors.toList());
             }
             return imageNamesList;
-
         } catch (SQLException e) {
             e.printStackTrace();
             LOGGER.severe("Error in getImageList\n" + e.getMessage());
@@ -101,7 +99,6 @@ public abstract class Database {
                 imageIdList.addAll(Stream.of(rs.getInt(1)).collect(Collectors.toList()));
             }
             return imageIdList;
-
         } catch (SQLException e) {
             e.printStackTrace();
             LOGGER.severe("Error in getImageIdList\n" + e.getMessage());
@@ -116,18 +113,14 @@ public abstract class Database {
         String createTableText = "CREATE TABLE IF NOT EXISTS `TEXT_TEST` (`id` INT(4) NOT NULL PRIMARY KEY, `text` VARCHAR(40) NULL)";
         String createTableImages = "CREATE TABLE IF NOT EXISTS `images` (`id` INT(4) NOT NULL PRIMARY KEY, `image_blob` BLOB NULL,`file_name` VARCHAR(40) NULL,`description` VARCHAR(40) NULL)";
         try {
-
             Statement st = Database.getConnection().createStatement();
             st.execute(USE_DB);
             st.executeUpdate(createTableImages);
             st.executeUpdate(createTableText);
-            LOGGER.finest("tables updated");
-            //--TODO ВЫКЛЮЧИТЬ AUTOCOMMIT
+            LOGGER.fine("tables updated");
         } catch (Exception ex) {
             LOGGER.severe("Failed to create tables. \n" +ex.getMessage());
         }
-//                    st.executeUpdate("CREATE table persons (id int(4) not null primary key , name varchar(32), age int(3))");
-//            st.executeUpdate("INSERT into persons (id,name,age) values (11,'Name3', 38)");
     }
 
     /**
@@ -184,4 +177,19 @@ public abstract class Database {
         return rs;
     }
 
+    public static Map<Integer, String> retrieveIdFileNameMap(){
+        final String idFileNameMapStr  = "  SELECT id, file_name FROM db.images";
+        try {
+            ResultSet set = Database.getConnection().createStatement().executeQuery(idFileNameMapStr);
+            Map<Integer, String> idFileNameMap = new HashMap<>();
+                while (set.next()) {
+                    idFileNameMap.put(set.getInt(1), set.getString(2));
+                }
+                idFileNameMap.forEach((x,y) -> System.out.println("Id: " + x + "\n FileName: " + y));
+            return idFileNameMap;
+        } catch (SQLException ex){
+            LOGGER.severe(ex.getMessage());
+            return null;
+        }
+    }
 }

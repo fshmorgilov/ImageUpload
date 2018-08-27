@@ -2,9 +2,7 @@ package jar.gui;
 
 import jar.model.core.ImageImpl;
 import jar.model.database.Database;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.collections.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -13,15 +11,19 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
-import java.awt.image.LookupOp;
+import javax.xml.crypto.Data;
+import java.awt.event.MouseEvent;
+import java.beans.EventHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +32,7 @@ public class MainGuiController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(MainGuiController.class.getName());
 
     @FXML
-    ListView<String> imageNamesList;
+    ListView<String> imageNamesListView;
     @FXML
     Button showBtn;
     @FXML
@@ -40,11 +42,14 @@ public class MainGuiController implements Initializable {
     @FXML
     BorderPane mainPane;
 
+
+    ObservableList<String> imageNameList = FXCollections.observableArrayList();
+    ObservableMap<Integer, String> imageIdFileNameMap = FXCollections.observableMap(Database.retrieveIdFileNameMap());
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-//--TODO добавить тут коллекцию из базы данных
 
-//        Image image = new Image("TestImage.jpg");
+        initializeImageNameList();
     }
 
     /**
@@ -53,14 +58,11 @@ public class MainGuiController implements Initializable {
 
     @FXML
     void uploadImage() {
-        //Вызывает базу, добавляет файл//--TODO
-        //Profit
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
         File defaultDirectory = new File("C:/Users/");
         chooser.setInitialDirectory(defaultDirectory);
         File imageFile = chooser.showOpenDialog(mainPane.getScene().getWindow());
-        //
         LOGGER.log(Level.FINE, "Uploading file: {0}", imageFile.getAbsolutePath());
         if (!(("".equals(imageFile.getAbsolutePath())))
                 && (imageFile.canRead())) {
@@ -68,13 +70,15 @@ public class MainGuiController implements Initializable {
             try {
                 image = new Image(new FileInputStream(imageFile));
                 ImageImpl imageImplObj = new ImageImpl(image, "placeholder", imageFile.getName());
-            Database.uploadImage(imageImplObj);
+                Database.uploadImage(imageImplObj);
+                imageNameList.add(imageFile.getName());
             } catch (FileNotFoundException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("ERROR");
                 alert.setHeaderText("File not Found");
                 alert.showAndWait();
                 e.printStackTrace();
+                LOGGER.warning("File not found");
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -98,24 +102,63 @@ public class MainGuiController implements Initializable {
         //Отобразить изображение в ImageView
     }
 
-//    private void initializeImageNamesList() {
-//        ObservableList<String> imageNameList = FXCollections.observableArrayList();
-//        imageNameList.addAll(Database.getImageList());
-//        imageNameList.addListener(new ListChangeListener<String>() {
+
+    private void initializeImageNameList() {
+        ObservableList imageValueList = FXCollections.observableArrayList(imageIdFileNameMap.values());
+        ObservableList imageKeyList = FXCollections.observableArrayList(imageIdFileNameMap.keySet());
+        imageNamesListView.setItems(imageValueList);
+        imageNamesListView.setOnMouseClicked(new javafx.event.EventHandler<javafx.scene.input.MouseEvent>() {
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                int id = (int) imageKeyList.get(imageNamesListView.getSelectionModel().getSelectedIndex());
+
+                try {
+                    Image image = Database.retrieveImage(id).getImage();
+                    showImage.setImage(image);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //TODO
+                }
+                System.out.println(id);
+                System.out.println(imageNamesListView.getSelectionModel().getSelectedItem());
+                System.out.println(imageNamesListView.getSelectionModel().getSelectedIndex());
+            }
+        });
+
+//        imageNamesListView.setOnMouseClicked(new javafx.event.EventHandler<javafx.scene.input.MouseEvent>() {
 //            @Override
-//            public void onChanged(Change<? extends String> c) {
-//                while (c.next()) {
-//                    if (c.wasRemoved()) {
-//
-//                    }
-//                    if (c.wasAdded()) {
-//                        //TODO дописать логику вставки изображения
+//            public void handle(javafx.scene.input.MouseEvent event) {
+//                Integer id = imageNamesListView.getSelectionModel().getSelectedIndex();
+//                if (!id.equals(null)) {
+//                    try {
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        LOGGER.severe(e.getMessage());
 //                    }
 //                }
 //            }
 //        });
-//        imageNamesList = new ListView<>(imageNameList);
-//    }
+    }
+
+
+    private void initializeImageNamesList() {
+        imageNameList.addAll(Database.getImageList());
+        imageNameList.forEach(LOGGER::info);
+        imageNameList.addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> c) {
+                while (c.next()) {
+                    if (c.wasRemoved()) {
+                        //TODO
+                    }
+                    if (c.wasAdded()) {
+
+                    }
+                }
+            }
+        });
+    }
 
 
 }

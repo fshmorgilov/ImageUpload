@@ -34,8 +34,6 @@ public class ImageImpl {
         this.description = description;
     }
 
-
-
     public Image getImage() {
         return image;
     }
