@@ -92,14 +92,9 @@ public class MainGuiController implements Initializable {
     /**
      * отображает выбранное изображение, по нажанию на соответствующую строку в imageameList
      */
+    @Deprecated
     @FXML
     void showImage() {
-        //--TODO
-
-        //Получить selected Item в ListView//--TODO
-        //Получить id по листу
-        //Сделать запрос в базу
-        //Отобразить изображение в ImageView
     }
 
 
@@ -124,41 +119,6 @@ public class MainGuiController implements Initializable {
                 System.out.println(imageNamesListView.getSelectionModel().getSelectedIndex());
             }
         });
-
-//        imageNamesListView.setOnMouseClicked(new javafx.event.EventHandler<javafx.scene.input.MouseEvent>() {
-//            @Override
-//            public void handle(javafx.scene.input.MouseEvent event) {
-//                Integer id = imageNamesListView.getSelectionModel().getSelectedIndex();
-//                if (!id.equals(null)) {
-//                    try {
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    } catch (SQLException e) {
-//                        LOGGER.severe(e.getMessage());
-//                    }
-//                }
-//            }
-//        });
     }
-
-
-    private void initializeImageNamesList() {
-        imageNameList.addAll(Database.getImageList());
-        imageNameList.forEach(LOGGER::info);
-        imageNameList.addListener(new ListChangeListener<String>() {
-            @Override
-            public void onChanged(Change<? extends String> c) {
-                while (c.next()) {
-                    if (c.wasRemoved()) {
-                        //TODO
-                    }
-                    if (c.wasAdded()) {
-
-                    }
-                }
-            }
-        });
-    }
-
 
 }
